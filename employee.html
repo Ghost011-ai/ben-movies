@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ben Movies — Employee Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo" onclick="location.href='index.html'">Ben <span>Movies</span></div>
+  <ul class="nav-links">
+    <li><button onclick="location.href='index.html'">Now Showing</button></li>
+    <li><button onclick="location.href='booking.html'">Book Tickets</button></li>
+    <li><button id="nav-login" onclick="location.href='login.html'">Member Login</button></li>
+    <li><span  id="nav-user"   class="hidden" style="color:var(--gold);font-size:.8rem;font-weight:700;"></span></li>
+    <li><button id="nav-logout" onclick="doLogout()" class="hidden" style="font-size:.72rem;padding:.3rem .9rem;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--muted);">Sign Out</button></li>
+    <li><button onclick="location.href='employee.html'" style="font-size:.68rem;"><span class="nav-badge">Staff</span></button></li>
+  </ul>
+</nav>
+
+<!-- ═══ EMPLOYEE LOGIN GATE ═══ -->
+<div id="emp-gate" style="min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:2rem;">
+  <div style="width:100%;max-width:420px;" class="fade-up">
+    <div class="text-center mb-3">
+      <div style="font-size:2.5rem;margin-bottom:.5rem;">🏢</div>
+      <h1 style="font-size:1.8rem;">Employee Portal</h1>
+      <p class="text-muted mt-1" style="font-size:.85rem;">Staff access only.</p>
+    </div>
+    <div class="alert alert-info mb-2" style="font-size:.8rem;">Demo: username <code>admin</code> / password <code>admin123</code></div>
+    <div class="form-card">
+      <div id="emp-err" class="alert alert-error hidden"></div>
+      <div class="form-group"><label>Username</label><input type="text"     id="emp-user" placeholder="admin"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="emp-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')empLogin()"/></div>
+      <button class="btn btn-primary w-full mt-1" onclick="empLogin()">Sign In to Staff Portal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EMPLOYEE DASHBOARD ═══ -->
+<div id="emp-dash" class="hidden">
+
+  <div style="background:var(--card);border-bottom:1px solid var(--border);padding:1.2rem 2rem;">
+    <div style="max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <h1 style="font-size:1.6rem;">Employee Dashboard</h1>
+        <p class="text-muted" style="font-size:.8rem;margin-top:.2rem;">Manage movies, discounts and customer records.</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <span id="emp-greeting" style="font-size:.8rem;color:var(--muted);"></span>
+        <button class="btn btn-ghost" onclick="empLogout()" style="font-size:.72rem;padding:.4rem .9rem;">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Films Showing</div><div class="stat-value" id="emp-film-count">8</div><div class="stat-sub">Currently on screen</div></div>
+      <div class="stat-card"><div class="stat-label">Members</div><div class="stat-value">4</div><div class="stat-sub">Registered accounts</div></div>
+      <div class="stat-card"><div class="stat-label">Today's Bookings</div><div class="stat-value">27</div><div class="stat-sub">As of today</div></div>
+      <div class="stat-card"><div class="stat-label">Revenue Today</div><div class="stat-value">£284</div><div class="stat-sub">Estimated</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="empTab(this,'movies')">🎬 Manage Films</button>
+      <button class="tab-btn"        onclick="empTab(this,'discounts')">🏷 Discounts</button>
+      <button class="tab-btn"        onclick="empTab(this,'customers')">👥 Customer Records</button>
+      <button class="tab-btn"        onclick="empTab(this,'popular')">📊 Popular Films</button>
+    </div>
+
+    <!-- Tab: Films -->
+    <div class="tab-panel active" id="etab-movies">
+      <div class="flex-between mb-2">
+        <h3 style="font-size:1.1rem;">Current Films</h3>
+        <button class="btn btn-primary" onclick="toggleAddForm()" style="font-size:.75rem;padding:.45rem 1rem;">+ Add Film</button>
+      </div>
+      <div id="emp-add-form" class="inner-panel hidden" style="margin-bottom:1rem;">
+        <div class="inner-panel-title">Add New Film</div>
+        <div class="form-row">
+          <div class="form-group"><label>Title</label><input type="text" id="af-title" placeholder="Film title"/></div>
+          <div class="form-group"><label>Genre</label><input type="text" id="af-genre" placeholder="Action / Drama"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Duration (mins)</label><input type="number" id="af-dur"   placeholder="120" min="60" max="240"/></div>
+          <div class="form-group"><label>Price (£)</label>       <input type="number" id="af-price" placeholder="11.50" step="0.50" min="5" max="25"/></div>
+        </div>
+        <div class="form-group">
+          <label>Age Rating</label>
+          <select id="af-rating"><option>U</option><option>PG</option><option>12A</option><option>12</option><option>15</option><option>18</option></select>
+        </div>
+        <div style="display:flex;gap:.8rem;">
+          <button class="btn btn-success" onclick="addFilm()">Save Film</button>
+          <button class="btn btn-ghost"   onclick="toggleAddForm()">Cancel</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="data-table">
+          <thead><tr><th>Film</th><th>Genre</th><th>Dur.</th><th>Rating</th><th>Price</th><th>Showtimes</th><th>Action</th></tr></thead>
+          <tbody id="emp-movies-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: Discounts -->
+    <div class="tab-panel" id="etab-discounts">
+      <div class="flex-between mb-2">
+        <h3 style="font-size:1.1rem;">Discount Management</h3>
+        <button class="btn btn-primary" onclick="saveDiscounts()" style="font-size:.75rem;padding:.45rem 1rem;">Save Changes</button>
+      </div>
+      <div style="display:grid;gap:1rem;max-width:580px;">
+        <div class="inner-panel" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+          <div><div style="font-weight:700;color:var(--text);">Regular Member</div><div style="font-size:.78rem;color:var(--muted);">Standard membership tier</div></div>
+          <div style="display:flex;align-items:center;gap:.5rem;"><input type="number" id="di-reg" value="10" min="0" max="50" style="width:72px;text-align:center;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:.4rem;border-radius:4px;font-family:inherit;"/><span class="text-muted">%</span></div>
+        </div>
+        <div class="inner-panel" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+          <div><div style="font-weight:700;color:var(--text);">Senior Member</div><div style="font-size:.78rem;color:var(--muted);">Age 65 and over</div></div>
+          <div style="display:flex;align-items:center;gap:.5rem;"><input type="number" id="di-sen" value="20" min="0" max="50" style="width:72px;text-align:center;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:.4rem;border-radius:4px;font-family:inherit;"/><span class="text-muted">%</span></div>
+        </div>
+        <div class="inner-panel" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+          <div><div style="font-weight:700;color:var(--text);">Children Member</div><div style="font-size:.78rem;color:var(--muted);">Under 15 years of age</div></div>
+          <div style="display:flex;align-items:center;gap:.5rem;"><input type="number" id="di-chi" value="30" min="0" max="50" style="width:72px;text-align:center;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:.4rem;border-radius:4px;font-family:inherit;"/><span class="text-muted">%</span></div>
+        </div>
+      </div>
+      <div id="disc-saved" class="alert alert-success hidden mt-2" style="max-width:580px;">✓ Discount rates saved successfully.</div>
+    </div>
+
+    <!-- Tab: Customer Records -->
+    <div class="tab-panel" id="etab-customers">
+      <div class="flex-between mb-2">
+        <h3 style="font-size:1.1rem;">Registered Members</h3>
+        <span style="font-size:.78rem;color:var(--muted);">4 members total</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="data-table">
+          <thead><tr><th>ID</th><th>Name</th><th>Username</th><th>Email</th><th>Type</th><th>Discount</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>M001</td><td><strong>John Smith</strong></td><td>john.smith</td><td>john@benmovies.com</td><td><span class="badge badge-gold">Regular</span></td><td>10%</td><td><span class="badge badge-green">Active</span></td></tr>
+            <tr><td>M002</td><td><strong>Mary Jones</strong></td><td>mary.jones</td><td>mary@benmovies.com</td><td><span class="badge badge-blue">Senior</span></td><td>20%</td><td><span class="badge badge-green">Active</span></td></tr>
+            <tr><td>M003</td><td><strong>Tom Kids</strong></td><td>tom.kids</td><td>tom@benmovies.com</td><td><span class="badge badge-blue">Children</span></td><td>30%</td><td><span class="badge badge-green">Active</span></td></tr>
+            <tr><td>M004</td><td><strong>Alice Wang</strong></td><td>alice.wang</td><td>alice@benmovies.com</td><td><span class="badge badge-gold">Regular</span></td><td>10%</td><td><span class="badge badge-green">Active</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: Popular Films -->
+    <div class="tab-panel" id="etab-popular">
+      <h3 style="font-size:1.1rem;margin-bottom:1.2rem;">Most Popular Films</h3>
+      <div class="tbl-wrap">
+        <table class="data-table">
+          <thead><tr><th>Rank</th><th>Film</th><th>Genre</th><th>Tickets Sold</th><th>Revenue</th><th>Rating</th></tr></thead>
+          <tbody>
+            <tr><td><strong style="color:var(--gold);">🥇 1</strong></td><td><strong>Man of Steel</strong></td><td>Action / Sci-Fi</td><td>312</td><td style="color:var(--gl);">£3,900</td><td>⭐ 4.8</td></tr>
+            <tr><td><strong style="color:var(--muted);">🥈 2</strong></td><td><strong>The Dark Knight Rises</strong></td><td>Action / Drama</td><td>284</td><td style="color:var(--gl);">£3,408</td><td>⭐ 4.9</td></tr>
+            <tr><td><strong style="color:var(--muted);">🥉 3</strong></td><td><strong>Justice League</strong></td><td>Superhero / Action</td><td>256</td><td style="color:var(--gl);">£2,816</td><td>⭐ 4.6</td></tr>
+            <tr><td>4</td><td><strong>Dragon Ball Super: Broly</strong></td><td>Anime / Action</td><td>198</td><td style="color:var(--gl);">£2,079</td><td>⭐ 4.7</td></tr>
+            <tr><td>5</td><td><strong>The Matrix Resurrections</strong></td><td>Sci-Fi / Action</td><td>176</td><td style="color:var(--gl);">£2,112</td><td>⭐ 4.5</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  updateNavbar();
+
+  let empMovies = [...MOVIES];
+
+  function empLogin() {
+    const u     = document.getElementById('emp-user').value.trim();
+    const p     = document.getElementById('emp-pass').value;
+    const errEl = document.getElementById('emp-err');
+    if (!u || !p) { errEl.textContent = '⚠ Please enter your credentials.'; errEl.classList.remove('hidden'); return; }
+    const emp = EMPLOYEES.find(e => e.username === u && e.password === p);
+    if (!emp) { errEl.textContent = '✕ Invalid credentials.'; errEl.classList.remove('hidden'); return; }
+    errEl.classList.add('hidden');
+    document.getElementById('emp-gate').style.display = 'none';
+    document.getElementById('emp-dash').classList.remove('hidden');
+    document.getElementById('emp-greeting').textContent =
+      'Signed in as ' + emp.name + ' · ' + emp.role + ' · ' +
+      new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+    renderEmpMovies();
+  }
+
+  function empLogout() {
+    document.getElementById('emp-gate').style.display = 'flex';
+    document.getElementById('emp-dash').classList.add('hidden');
+    document.getElementById('emp-user').value = '';
+    document.getElementById('emp-pass').value = '';
+  }
+
+  function empTab(btn, id) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('etab-' + id).classList.add('active');
+  }
+
+  function renderEmpMovies() {
+    document.getElementById('emp-movies-tbody').innerHTML = empMovies.map(m =>
+      `<tr>
+        <td>${m.emoji} <strong>${m.title}</strong></td>
+        <td>${m.genre}</td><td>${m.duration}min</td>
+        <td><span class="badge badge-gold">${m.rating}</span></td>
+        <td>${fmt(m.price)}</td>
+        <td style="font-size:.78rem;">${m.showtimes.slice(0,3).join(', ')}${m.showtimes.length>3?'…':''}</td>
+        <td><button class="btn btn-danger" style="font-size:.68rem;padding:.3rem .7rem;" onclick="removeFilm(${m.id})">Remove</button></td>
+      </tr>`).join('');
+    document.getElementById('emp-film-count').textContent = empMovies.length;
+  }
+
+  function removeFilm(id) {
+    if (confirm('Remove this film?')) { empMovies = empMovies.filter(m => m.id !== id); renderEmpMovies(); }
+  }
+
+  function toggleAddForm() { document.getElementById('emp-add-form').classList.toggle('hidden'); }
+
+  function addFilm() {
+    const title = document.getElementById('af-title').value.trim();
+    const genre = document.getElementById('af-genre').value.trim();
+    const dur   = parseInt(document.getElementById('af-dur').value);
+    const price = parseFloat(document.getElementById('af-price').value);
+    const rat   = document.getElementById('af-rating').value;
+    if (!title) { alert('Please enter a title.'); return; }
+    if (!genre) { alert('Please enter a genre.'); return; }
+    if (!dur || dur < 60) { alert('Please enter a valid duration.'); return; }
+    if (!price || price < 5) { alert('Please enter a valid price.'); return; }
+    const newId = Math.max(...empMovies.map(m => m.id)) + 1;
+    empMovies.push({ id:newId, title, genre, rating:rat, duration:dur, price, showtimes:["12:00","15:00","18:00","21:00"], desc:"Coming soon.", emoji:"🎬", img:"" });
+    renderEmpMovies(); toggleAddForm();
+    ['af-title','af-genre','af-dur','af-price'].forEach(id => document.getElementById(id).value = '');
+    alert('Film "' + title + '" added!');
+  }
+
+  function saveDiscounts() {
+    const r = document.getElementById('di-reg').value;
+    const s = document.getElementById('di-sen').value;
+    const c = document.getElementById('di-chi').value;
+    if ([r,s,c].some(v => v < 0 || v > 50)) { alert('Values must be 0–50%.'); return; }
+    const el = document.getElementById('disc-saved');
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 3000);
+    alert(`Discounts updated:\nRegular: ${r}%\nSenior: ${s}%\nChildren: ${c}%`);
+  }
+</script>
+</body>
+</html>

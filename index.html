@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ben Movies — Now Showing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo" onclick="location.href='index.html'">Ben <span>Movies</span></div>
+  <ul class="nav-links">
+    <li><button onclick="location.href='index.html'"   class="active">Now Showing</button></li>
+    <li><button onclick="location.href='booking.html'">Book Tickets</button></li>
+    <li><button id="nav-login" onclick="location.href='login.html'">Member Login</button></li>
+    <li><span  id="nav-user"   class="hidden" style="color:var(--gold);font-size:.8rem;font-weight:700;"></span></li>
+    <li><button id="nav-logout" onclick="doLogout()" class="hidden" style="font-size:.72rem;padding:.3rem .9rem;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--muted);">Sign Out</button></li>
+    <li><button onclick="location.href='employee.html'" style="font-size:.68rem;"><span class="nav-badge">Staff</span></button></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero fade-up">
+  <p class="hero-eyebrow">✦ Birmingham's Premier Cinema ✦</p>
+  <h1>Where Stories<br><em>Come Alive</em></h1>
+  <p>Browse our current films, check showtimes, and book your seats in minutes.</p>
+  <div class="hero-btns">
+    <button class="btn btn-primary" onclick="location.href='booking.html'">Book Tickets Now</button>
+    <button class="btn btn-outline" onclick="location.href='login.html'">Member Login &amp; Discounts</button>
+  </div>
+</div>
+
+<!-- DISCOUNT STRIP -->
+<div class="disc-strip">
+  <strong>Member Discounts</strong>
+  <span>Regular — <strong style="color:var(--text)">10% off</strong></span>
+  <span>Senior — <strong style="color:var(--text)">20% off</strong></span>
+  <span>Children — <strong style="color:var(--text)">30% off</strong></span>
+  <button onclick="location.href='login.html'" style="margin-left:auto;background:none;border:none;color:var(--gold);font-size:.75rem;cursor:pointer;font-family:inherit;">Sign in to use your discount →</button>
+</div>
+
+<!-- MOVIE GRID -->
+<div class="section">
+  <div class="section-header">
+    <h2>Now Showing</h2>
+    <span class="count">8 films available</span>
+  </div>
+  <div class="movies-grid" id="home-movies-grid"></div>
+</div>
+
+<footer>
+  <span class="footer-logo">Ben Movies</span>
+  <span>© 2026 Ben Movies Birmingham. All rights reserved.</span>
+  <div style="display:flex;gap:1.5rem;">
+    <button onclick="location.href='index.html'"    style="background:none;border:none;color:var(--dim);cursor:pointer;font-family:inherit;font-size:.75rem;">Home</button>
+    <button onclick="location.href='booking.html'"  style="background:none;border:none;color:var(--dim);cursor:pointer;font-family:inherit;font-size:.75rem;">Booking</button>
+    <button onclick="location.href='login.html'"    style="background:none;border:none;color:var(--dim);cursor:pointer;font-family:inherit;font-size:.75rem;">Members</button>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  updateNavbar();
+
+  function renderHomeMovies() {
+    document.getElementById('home-movies-grid').innerHTML = MOVIES.map(m => `
+      <div class="movie-card">
+        <img src="${m.img}" alt="${m.title}" onerror="this.style.display='none'"/>
+        <div class="movie-info">
+          <div class="movie-genre">${m.genre}</div>
+          <div class="movie-title">${m.title}</div>
+          <div class="movie-meta"><span>⏱ ${m.duration}min</span><span>${m.rating}</span></div>
+          <p style="font-size:.75rem;color:var(--dim);line-height:1.5;margin-bottom:.6rem;">${m.desc}</p>
+          <div class="showtimes">${m.showtimes.map(t => `<span class="st-badge">${t}</span>`).join('')}</div>
+          <div style="margin-top:.6rem;"><div class="movie-price">${fmt(m.price)} <small>/ ticket</small></div></div>
+          <button class="btn-book" onclick="bookNow(${m.id})">Book Now</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function bookNow(id) {
+    sessionStorage.setItem('preselect', id);
+    location.href = 'booking.html';
+  }
+
+  renderHomeMovies();
+</script>
+</body>
+</html>

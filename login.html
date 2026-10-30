@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ben Movies — Member Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo" onclick="location.href='index.html'">Ben <span>Movies</span></div>
+  <ul class="nav-links">
+    <li><button onclick="location.href='index.html'">Now Showing</button></li>
+    <li><button onclick="location.href='booking.html'">Book Tickets</button></li>
+    <li><button id="nav-login" onclick="location.href='login.html'" class="active">Member Login</button></li>
+    <li><span  id="nav-user"   class="hidden" style="color:var(--gold);font-size:.8rem;font-weight:700;"></span></li>
+    <li><button id="nav-logout" onclick="doLogout()" class="hidden" style="font-size:.72rem;padding:.3rem .9rem;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--muted);">Sign Out</button></li>
+    <li><button onclick="location.href='employee.html'" style="font-size:.68rem;"><span class="nav-badge">Staff</span></button></li>
+  </ul>
+</nav>
+
+<div style="min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:2rem;">
+  <div style="width:100%;max-width:460px;" class="fade-up">
+
+    <div class="text-center mb-3">
+      <div style="font-size:2.5rem;margin-bottom:.5rem;">🎬</div>
+      <h1 style="font-size:1.8rem;">Member Login</h1>
+      <p class="text-muted mt-1" style="font-size:.85rem;">Sign in to access exclusive member discounts.</p>
+    </div>
+
+    <!-- Demo credentials hint -->
+    <div class="alert alert-info mb-2" style="font-size:.8rem;">
+      <div><strong>Demo Accounts</strong> (all use password <code>pass123</code>)<br>
+      <code>john.smith</code> – Regular (10%) &nbsp;|&nbsp;
+      <code>mary.jones</code> – Senior (20%) &nbsp;|&nbsp;
+      <code>tom.kids</code>   – Children (30%)</div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="form-card" id="login-form-panel">
+      <div id="login-err" class="alert alert-error hidden"></div>
+      <div class="form-group"><label>Username</label><input type="text"     id="login-user" placeholder="e.g. john.smith"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="btn btn-primary w-full mt-1" onclick="doLogin()">Sign In to My Account</button>
+      <div style="display:flex;align-items:center;gap:1rem;margin:1.2rem 0;color:var(--dim);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>or<div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
+      <button class="btn btn-ghost w-full" onclick="location.href='booking.html'">Continue as Guest (no discount)</button>
+    </div>
+
+    <!-- Logged-in State -->
+    <div class="form-card hidden text-center" id="login-ok-panel">
+      <div style="font-size:2.5rem;margin-bottom:.8rem;">✅</div>
+      <h2 id="login-ok-name" style="font-size:1.4rem;"></h2>
+      <p  id="login-ok-type" class="text-muted mt-1" style="font-size:.85rem;"></p>
+      <div class="alert alert-success mt-2" id="login-ok-disc"></div>
+      <div style="display:flex;flex-direction:column;gap:.8rem;margin-top:1.2rem;">
+        <button class="btn btn-primary" onclick="location.href='booking.html'">Book Tickets with Discount</button>
+        <button class="btn btn-ghost"   onclick="signOut()">Sign Out</button>
+      </div>
+    </div>
+
+    <!-- Member Benefits -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.3rem;margin-top:1.5rem;">
+      <div style="font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;font-weight:700;">Member Benefits</div>
+      <div style="display:grid;gap:.6rem;font-size:.84rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span class="text-muted">Regular Member</span><span class="badge badge-gold">10% off</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span class="text-muted">Senior Member</span>  <span class="badge badge-green">20% off</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span class="text-muted">Children Member</span><span class="badge badge-blue">30% off</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  updateNavbar();
+
+  // If already logged in, show the welcome panel
+  (function() {
+    const ms = getSession();
+    if (ms) showLoggedInPanel(ms);
+  })();
+
+  function doLogin() {
+    const u     = document.getElementById('login-user').value.trim();
+    const p     = document.getElementById('login-pass').value;
+    const errEl = document.getElementById('login-err');
+    if (!u || !p) { errEl.textContent = '⚠ Please enter your username and password.'; errEl.classList.remove('hidden'); return; }
+    const mem = MEMBERS.find(m => m.username === u && m.password === p);
+    if (!mem) { errEl.textContent = '✕ Invalid username or password.'; errEl.classList.remove('hidden'); return; }
+    setSession(mem); errEl.classList.add('hidden');
+    showLoggedInPanel(mem); updateNavbar();
+  }
+
+  function showLoggedInPanel(mem) {
+    document.getElementById('login-form-panel').classList.add('hidden');
+    document.getElementById('login-ok-panel').classList.remove('hidden');
+    const types = { regular:'Regular Member', senior:'Senior Member', children:'Children Member' };
+    const discs = { regular:'10% discount on all tickets', senior:'20% discount on all tickets', children:'30% discount on all tickets' };
+    document.getElementById('login-ok-name').textContent = 'Welcome back, ' + mem.name + '!';
+    document.getElementById('login-ok-type').textContent = types[mem.type];
+    document.getElementById('login-ok-disc').textContent = '🎉 ' + discs[mem.type];
+  }
+
+  function signOut() {
+    clearSession(); updateNavbar();
+    document.getElementById('login-form-panel').classList.remove('hidden');
+    document.getElementById('login-ok-panel').classList.add('hidden');
+    document.getElementById('login-user').value = '';
+    document.getElementById('login-pass').value = '';
+  }
+</script>
+</body>
+</html>

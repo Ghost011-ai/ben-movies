@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ben Movies — Payment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo" onclick="location.href='index.html'">Ben <span>Movies</span></div>
+  <ul class="nav-links">
+    <li><button onclick="location.href='index.html'">Now Showing</button></li>
+    <li><button onclick="location.href='booking.html'">Book Tickets</button></li>
+    <li><button id="nav-login" onclick="location.href='login.html'">Member Login</button></li>
+    <li><span  id="nav-user"   class="hidden" style="color:var(--gold);font-size:.8rem;font-weight:700;"></span></li>
+    <li><button id="nav-logout" onclick="doLogout()" class="hidden" style="font-size:.72rem;padding:.3rem .9rem;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--muted);">Sign Out</button></li>
+    <li><button onclick="location.href='employee.html'" style="font-size:.68rem;"><span class="nav-badge">Staff</span></button></li>
+  </ul>
+</nav>
+
+<!-- PROGRESS STEPS -->
+<div class="steps">
+  <div class="step done"><div class="step-dot">✓</div><div class="step-lbl">Select</div></div>
+  <div class="step-line done"></div>
+  <div class="step done"><div class="step-dot">✓</div><div class="step-lbl">Details</div></div>
+  <div class="step-line done"></div>
+  <div class="step active"><div class="step-dot">3</div><div class="step-lbl">Payment</div></div>
+</div>
+
+<div class="section">
+  <div class="two-col">
+
+    <!-- LEFT: Payment Form -->
+    <div class="fade-up">
+
+      <!-- Order Review -->
+      <div class="inner-panel">
+        <div class="inner-panel-title">Order Review</div>
+        <div id="pay-order-details" style="font-size:.88rem;color:var(--muted);">Loading…</div>
+      </div>
+
+      <!-- Payment Details Form -->
+      <div id="pay-panel-form">
+        <h2 style="font-size:1.9rem;margin-bottom:.5rem;">Payment Details</h2>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:1.2rem;">⚠ This is a <strong style="color:var(--gold);">demo payment screen</strong>. No real transaction will occur.</p>
+
+        <div class="inner-panel">
+          <div class="inner-panel-title">Card Information</div>
+          <div style="display:flex;gap:.5rem;margin-bottom:1rem;" id="card-type-row">
+            <button class="btn btn-outline" style="flex:1;font-size:.72rem;padding:.5rem;" onclick="selectCard(this,'visa')">💳 Visa</button>
+            <button class="btn btn-ghost"   style="flex:1;font-size:.72rem;padding:.5rem;" onclick="selectCard(this,'mc')">💳 Mastercard</button>
+            <button class="btn btn-ghost"   style="flex:1;font-size:.72rem;padding:.5rem;" onclick="selectCard(this,'amex')">💳 Amex</button>
+          </div>
+          <div class="form-group"><label>Name on Card</label><input type="text" id="pay-name" placeholder="Jane Smith"/></div>
+          <div class="form-group">
+            <label>Card Number</label>
+            <div class="card-wrap">
+              <input type="text" id="pay-number" placeholder="1234  5678  9012  3456" maxlength="19" oninput="fmtCard(this)"/>
+              <span class="card-ico" id="pay-card-ico">💳</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Expiry</label><input type="text" id="pay-expiry" placeholder="MM / YY" maxlength="7" oninput="fmtExpiry(this)"/></div>
+            <div class="form-group"><label>CVV</label><input type="text" id="pay-cvv" placeholder="•••" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'')"/></div>
+          </div>
+        </div>
+
+        <div class="inner-panel">
+          <div class="inner-panel-title">Billing Address</div>
+          <div class="form-group"><label>Street Address</label><input type="text" id="pay-addr" placeholder="123 Cinema Street"/></div>
+          <div class="form-row">
+            <div class="form-group"><label>City</label>    <input type="text" id="pay-city" placeholder="Birmingham"/></div>
+            <div class="form-group"><label>Postcode</label><input type="text" id="pay-post" placeholder="B1 1AA"/></div>
+          </div>
+        </div>
+
+        <label class="checkbox-item mb-2" style="font-size:.82rem;">
+          <input type="checkbox" id="pay-terms"/> I agree to the Ben Movies Terms &amp; Conditions and understand this is a demo payment.
+        </label>
+        <button class="btn btn-primary w-full" onclick="processPayment()" style="font-size:.92rem;padding:.95rem;">🔒 Pay <span id="pay-btn-amt">£0.00</span></button>
+        <button class="btn btn-ghost w-full mt-1" onclick="location.href='booking.html'">← Back to Booking</button>
+      </div>
+
+      <!-- Processing Spinner -->
+      <div id="pay-panel-processing" class="hidden text-center" style="padding:4rem 0;">
+        <div class="spinner" style="margin:0 auto 1.5rem;"></div>
+        <h2 style="font-size:1.5rem;margin-bottom:.5rem;">Processing Payment…</h2>
+        <p class="text-muted" style="font-size:.88rem;">Please do not close this window.</p>
+      </div>
+
+      <!-- Booking Confirmed E-Ticket -->
+      <div id="pay-panel-confirmed" class="hidden fade-up">
+        <div class="text-center" style="padding:1.5rem 0;">
+          <div style="font-size:4rem;margin-bottom:.8rem;">🎉</div>
+          <h2 style="font-size:2rem;color:var(--gold);margin-bottom:.5rem;">Booking Confirmed!</h2>
+          <p class="text-muted" style="font-size:.88rem;max-width:380px;margin:0 auto 1rem;">Your tickets are booked. A confirmation has been sent to your email.</p>
+          <div class="alert alert-success" style="display:inline-flex;gap:.5rem;justify-content:center;">Booking Reference: <strong id="conf-ref"></strong></div>
+        </div>
+        <div class="ticket-card">
+          <div class="ticket-badge">E-Ticket</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+            <div>
+              <div id="tkt-emoji" style="font-size:2.5rem;margin-bottom:.4rem;"></div>
+              <div id="tkt-title" style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;"></div>
+              <div id="tkt-genre" style="font-size:.75rem;color:var(--gold);margin-top:.2rem;"></div>
+            </div>
+            <div style="text-align:right;font-size:.82rem;color:var(--muted);">
+              <div id="tkt-date"  style="margin-bottom:.3rem;"></div>
+              <div id="tkt-time"  style="font-size:1rem;color:var(--text);font-weight:700;"></div>
+              <div id="tkt-seats" style="margin-top:.2rem;"></div>
+            </div>
+          </div>
+          <div style="border-top:1px dashed var(--border);margin:1rem 0;"></div>
+          <div style="display:flex;justify-content:space-between;font-size:.82rem;flex-wrap:wrap;gap:.5rem;">
+            <div style="color:var(--muted);">Guest: <strong style="color:var(--text);" id="tkt-name"></strong></div>
+            <div style="color:var(--muted);">Paid: <strong style="color:var(--gl);" id="tkt-total"></strong></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="location.href='index.html'"   style="flex:1;">Back to Home</button>
+          <button class="btn btn-outline" onclick="location.href='booking.html'" style="flex:1;">Book Another</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Order Summary Sidebar -->
+    <div style="position:sticky;top:80px;" class="fade-up">
+      <div style="font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;font-weight:700;">Order Summary</div>
+      <div class="summary-card">
+        <div class="sum-row"><span class="lbl">Film</span>    <span class="val" id="psum-movie">—</span></div>
+        <div class="sum-row"><span class="lbl">Date</span>    <span class="val" id="psum-date">—</span></div>
+        <div class="sum-row"><span class="lbl">Showtime</span><span class="val" id="psum-time">—</span></div>
+        <div class="sum-row"><span class="lbl">Tickets</span> <span class="val" id="psum-qty">—</span></div>
+        <div class="sum-row"><span class="lbl">Subtotal</span><span class="val" id="psum-sub">—</span></div>
+        <div class="sum-row"><span class="lbl" style="color:#5ddb8c;">Discount</span><span class="val" id="psum-disc" style="color:#5ddb8c;">—</span></div>
+        <div class="sum-row total"><span class="lbl">Total</span><span class="val" id="psum-total">£0.00</span></div>
+      </div>
+      <div class="mt-2 text-center" style="font-size:.72rem;color:var(--dim);line-height:1.8;">🔒 256-bit SSL Encryption<br>Secure Payment Processing</div>
+    </div>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  updateNavbar();
+
+  const b = getBooking();
+
+  (function initPayment() {
+    if (!b) {
+      document.getElementById('pay-order-details').innerHTML =
+        '<span style="color:var(--red);">No booking found. <button onclick="location.href=\'booking.html\'" style="background:none;border:none;color:var(--gold);cursor:pointer;font-family:inherit;">Start here</button>.</span>';
+      return;
+    }
+    const m2 = MOVIES.find(x => x.id === b.movieId);
+    document.getElementById('pay-order-details').innerHTML =
+      `<div style="display:flex;align-items:center;gap:1rem;">
+        ${m2 && m2.img
+          ? `<img src="${m2.img}" alt="${b.movieTitle}" style="width:80px;height:110px;object-fit:cover;border-radius:6px;border:1px solid var(--border);flex-shrink:0;" onerror="this.style.display='none'"/>`
+          : `<span style="font-size:2rem;">${b.movieEmoji}</span>`}
+        <div>
+          <strong style="color:var(--text);font-family:'Playfair Display',serif;font-size:1.05rem;">${b.movieTitle}</strong>
+          <div style="font-size:.78rem;color:var(--gold);margin:.2rem 0;">${m2 ? m2.genre : ''}</div>
+          <div style="font-size:.82rem;margin-top:.2rem;">${b.dateText} at ${b.time} — ${b.qty} ticket${b.qty>1?'s':''}</div>
+          <div style="font-size:.82rem;margin-top:.3rem;">${b.firstName} ${b.lastName} · <span class="badge badge-gold">${b.memberType}</span></div>
+        </div>
+      </div>`;
+    document.getElementById('psum-movie').textContent  = b.movieTitle;
+    document.getElementById('psum-date').textContent   = b.dateText;
+    document.getElementById('psum-time').textContent   = b.time;
+    document.getElementById('psum-qty').textContent    = b.qty + (b.qty===1?' ticket':' tickets');
+    document.getElementById('psum-sub').textContent    = fmt(b.subtotal);
+    document.getElementById('psum-disc').textContent   = b.discountAmt > 0 ? '−' + fmt(b.discountAmt) : 'None';
+    document.getElementById('psum-total').textContent  = fmt(b.total);
+    document.getElementById('pay-btn-amt').textContent = fmt(b.total);
+  })();
+
+  function selectCard(btn, type) {
+    document.querySelectorAll('#card-type-row button').forEach(b => { b.className = 'btn btn-ghost'; b.style.cssText = 'flex:1;font-size:.72rem;padding:.5rem;'; });
+    btn.className = 'btn btn-outline'; btn.style.cssText = 'flex:1;font-size:.72rem;padding:.5rem;';
+    document.getElementById('pay-card-ico').textContent = {visa:'💙',mc:'🔴',amex:'🟦'}[type] || '💳';
+  }
+
+  function fmtCard(i)   { let v = i.value.replace(/\D/g,'').substring(0,16); i.value = v.replace(/(.{4})/g,'$1  ').trim(); }
+  function fmtExpiry(i) { let v = i.value.replace(/\D/g,'').substring(0,4); if (v.length > 2) v = v.substring(0,2) + ' / ' + v.substring(2); i.value = v; }
+
+  function processPayment() {
+    if (!b) { alert('No booking found.'); location.href = 'booking.html'; return; }
+    const n   = document.getElementById('pay-name').value.trim();
+    const num = document.getElementById('pay-number').value.replace(/\s/g,'');
+    const exp = document.getElementById('pay-expiry').value.trim();
+    const cvv = document.getElementById('pay-cvv').value.trim();
+    const adr = document.getElementById('pay-addr').value.trim();
+    const cty = document.getElementById('pay-city').value.trim();
+    const pst = document.getElementById('pay-post').value.trim();
+    const trm = document.getElementById('pay-terms').checked;
+    if (!n)              { alert('Please enter the name on your card.'); return; }
+    if (num.length < 16) { alert('Please enter a valid 16-digit card number.'); return; }
+    if (!exp || exp.length < 7) { alert('Please enter a valid expiry date.'); return; }
+    if (!cvv || cvv.length < 3) { alert('Please enter a valid CVV.'); return; }
+    if (!adr || !cty || !pst)   { alert('Please complete your billing address.'); return; }
+    if (!trm) { alert('Please agree to the Terms & Conditions.'); return; }
+    document.getElementById('pay-panel-form').classList.add('hidden');
+    document.getElementById('pay-panel-processing').classList.remove('hidden');
+    setTimeout(() => { document.getElementById('pay-panel-processing').classList.add('hidden'); showConfirmation(); }, 2500);
+  }
+
+  function showConfirmation() {
+    const m   = MOVIES.find(x => x.id === b.movieId);
+    const ref = 'BM' + Math.random().toString(36).toUpperCase().substring(2,8);
+    document.getElementById('pay-panel-confirmed').classList.remove('hidden');
+    document.getElementById('conf-ref').textContent  = ref;
+    if (m && m.img) {
+      document.getElementById('tkt-emoji').innerHTML =
+        `<img src="${m.img}" alt="${m.title}" style="width:90px;height:125px;object-fit:cover;border-radius:6px;border:1px solid var(--border);" onerror="this.outerHTML='<span style=font-size:2.5rem>${b.movieEmoji}</span>'"/>`;
+    } else {
+      document.getElementById('tkt-emoji').textContent = b.movieEmoji;
+    }
+    document.getElementById('tkt-title').textContent = b.movieTitle;
+    document.getElementById('tkt-genre').textContent = m ? m.genre : '';
+    document.getElementById('tkt-date').textContent  = b.dateText;
+    document.getElementById('tkt-time').textContent  = b.time;
+    document.getElementById('tkt-seats').textContent = b.qty + ' Seat' + (b.qty>1?'s':'');
+    document.getElementById('tkt-name').textContent  = b.firstName + ' ' + b.lastName;
+    document.getElementById('tkt-total').textContent = fmt(b.total);
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+</script>
+</body>
+</html>

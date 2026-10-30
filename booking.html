@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ben Movies — Book Tickets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo" onclick="location.href='index.html'">Ben <span>Movies</span></div>
+  <ul class="nav-links">
+    <li><button onclick="location.href='index.html'">Now Showing</button></li>
+    <li><button onclick="location.href='booking.html'" class="active">Book Tickets</button></li>
+    <li><button id="nav-login" onclick="location.href='login.html'">Member Login</button></li>
+    <li><span  id="nav-user"   class="hidden" style="color:var(--gold);font-size:.8rem;font-weight:700;"></span></li>
+    <li><button id="nav-logout" onclick="doLogout()" class="hidden" style="font-size:.72rem;padding:.3rem .9rem;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--muted);">Sign Out</button></li>
+    <li><button onclick="location.href='employee.html'" style="font-size:.68rem;"><span class="nav-badge">Staff</span></button></li>
+  </ul>
+</nav>
+
+<!-- PROGRESS STEPS -->
+<div class="steps">
+  <div class="step active"><div class="step-dot">1</div><div class="step-lbl">Select</div></div>
+  <div class="step-line"></div>
+  <div class="step"><div class="step-dot">2</div><div class="step-lbl">Details</div></div>
+  <div class="step-line"></div>
+  <div class="step"><div class="step-dot">3</div><div class="step-lbl">Review</div></div>
+</div>
+
+<div class="section">
+  <div class="two-col">
+
+    <!-- LEFT: Booking Form -->
+    <div class="fade-up">
+      <h2 style="font-size:2rem;margin-bottom:.3rem;">Book Your Tickets</h2>
+      <p class="text-muted mb-3" style="font-size:.85rem;">Choose your film, showtime and enter your details.</p>
+
+      <!-- Step 1: Customer Type -->
+      <div class="inner-panel">
+        <div class="inner-panel-title">Step 1 — Customer Type</div>
+        <div id="bk-member-notice" class="alert alert-info hidden" style="font-size:.82rem;">
+          ✦ Logged in as <strong id="bk-member-name"></strong> — discount applied automatically.
+        </div>
+        <label class="radio-item"><input type="radio" name="cust" value="guest" checked onchange="onCustChange('guest')"/> Guest — no login required, no discount</label>
+        <label class="radio-item"><input type="radio" name="cust" value="member" onchange="onCustChange('member')"/> Member — login required to apply discount</label>
+      </div>
+
+      <!-- Step 2: Film Selection -->
+      <div class="inner-panel">
+        <div class="inner-panel-title">Step 2 — Select Film</div>
+        <div class="form-group">
+          <label>Film</label>
+          <select id="bk-movie" onchange="onMovieChange()">
+            <option value="">— Choose a film —</option>
+          </select>
+        </div>
+        <div id="bk-preview" class="hidden" style="display:flex;align-items:center;gap:1rem;padding:.8rem;background:var(--panel);border:1px solid var(--border);border-radius:4px;margin-top:.5rem;">
+          <span id="bk-prev-emoji" style="font-size:2.2rem;"></span>
+          <div>
+            <div id="bk-prev-title" style="font-family:'Playfair Display',serif;font-weight:700;font-size:.95rem;"></div>
+            <div id="bk-prev-genre" style="font-size:.72rem;color:var(--gold);margin:.1rem 0;"></div>
+            <div id="bk-prev-meta"  style="font-size:.72rem;color:var(--muted);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Show Details -->
+      <div class="inner-panel">
+        <div class="inner-panel-title">Step 3 — Show Details</div>
+        <div class="form-group">
+          <label>Showtime</label>
+          <div id="bk-showtimes" style="display:flex;flex-wrap:wrap;gap:.4rem;">
+            <span style="color:var(--dim);font-size:.82rem;">Select a film first.</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Date</label><select id="bk-date" onchange="updateSummary()"></select></div>
+          <div class="form-group"><label>No. of Tickets</label><input type="number" id="bk-qty" min="1" max="10" value="1" oninput="updateSummary()"/></div>
+        </div>
+      </div>
+
+      <!-- Step 4: Contact Details -->
+      <div class="inner-panel">
+        <div class="inner-panel-title">Step 4 — Contact Details</div>
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" id="bk-fname" placeholder="Jane"/></div>
+          <div class="form-group"><label>Last Name</label><input type="text"  id="bk-lname" placeholder="Smith"/></div>
+        </div>
+        <div class="form-group"><label>Email Address</label><input type="email" id="bk-email" placeholder="jane@example.com"/></div>
+      </div>
+
+      <button class="btn btn-primary w-full" onclick="goToPayment()" style="font-size:.9rem;padding:.95rem;">Continue to Payment →</button>
+      <p class="text-center mt-1" style="font-size:.75rem;color:var(--dim);">You won't be charged yet</p>
+    </div>
+
+    <!-- RIGHT: Summary Sidebar -->
+    <div style="position:sticky;top:80px;" class="fade-up">
+      <div style="font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;font-weight:700;">Booking Summary</div>
+      <div class="summary-card">
+        <div class="sum-row"><span class="lbl">Film</span>         <span class="val" id="sum-movie">—</span></div>
+        <div class="sum-row"><span class="lbl">Date</span>         <span class="val" id="sum-date">—</span></div>
+        <div class="sum-row"><span class="lbl">Showtime</span>     <span class="val" id="sum-time">—</span></div>
+        <div class="sum-row"><span class="lbl">Tickets</span>      <span class="val" id="sum-qty">—</span></div>
+        <div class="sum-row"><span class="lbl">Price / ticket</span><span class="val" id="sum-price">—</span></div>
+        <div class="sum-row"><span class="lbl">Subtotal</span>     <span class="val" id="sum-sub">—</span></div>
+        <div class="sum-row"><span class="lbl" style="color:#5ddb8c;">Discount</span><span class="val" id="sum-disc" style="color:#5ddb8c;">—</span></div>
+        <div class="sum-row total"><span class="lbl">Total</span>  <span class="val" id="sum-total">£0.00</span></div>
+      </div>
+      <div class="mt-2 text-center" style="font-size:.72rem;color:var(--dim);line-height:1.8;">🔒 Secure booking<br>Tickets delivered by email</div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span class="footer-logo">Ben Movies</span>
+  <span>© 2026 Ben Movies Birmingham.</span>
+  <button onclick="location.href='index.html'" style="background:none;border:none;color:var(--dim);cursor:pointer;font-family:inherit;font-size:.75rem;">← Back to Home</button>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  let bkTime = "";
+
+  updateNavbar();
+
+  // Pre-fill movie if coming from home
+  (function init() {
+    const ms = getSession();
+
+    // Populate film select
+    const sel = document.getElementById('bk-movie');
+    MOVIES.forEach(m => {
+      const o = document.createElement('option');
+      o.value = m.id; o.textContent = m.title;
+      sel.appendChild(o);
+    });
+
+    // Populate dates
+    const dsel = document.getElementById('bk-date');
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    for (let i = 0; i < 8; i++) {
+      const d = new Date(); d.setDate(d.getDate() + i);
+      const lbl = (i===0?'Today, ':i===1?'Tomorrow, ':days[d.getDay()]+', ') + d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      const o = document.createElement('option');
+      o.value = d.toISOString().split('T')[0]; o.textContent = lbl;
+      dsel.appendChild(o);
+    }
+
+    // Handle preselect from home page
+    const pre = sessionStorage.getItem('preselect');
+    if (pre) { sel.value = pre; sessionStorage.removeItem('preselect'); onMovieChange(); }
+
+    // Handle logged-in member
+    if (ms) {
+      document.getElementById('bk-member-name').textContent = ms.name + ' (' + ms.type + ')';
+      document.getElementById('bk-member-notice').classList.remove('hidden');
+      document.querySelector('input[name="cust"][value="member"]').checked = true;
+    }
+
+    updateSummary();
+  })();
+
+  function onMovieChange() {
+    const id = parseInt(document.getElementById('bk-movie').value);
+    const m  = MOVIES.find(x => x.id === id);
+    if (!m) { document.getElementById('bk-preview').classList.add('hidden'); return; }
+    document.getElementById('bk-preview').classList.remove('hidden');
+    document.getElementById('bk-preview').style.display = 'flex';
+
+    const emojiEl = document.getElementById('bk-prev-emoji');
+    emojiEl.innerHTML = '';
+    emojiEl.style.fontSize = '0';
+    if (m.img) {
+      const img = document.createElement('img');
+      img.src = m.img;
+      img.alt = m.title;
+      img.style.cssText = 'width:64px;height:90px;object-fit:cover;border-radius:5px;border:1px solid var(--border);display:block;flex-shrink:0;';
+      img.onerror = function() { emojiEl.textContent = m.emoji; emojiEl.style.fontSize = '2.2rem'; };
+      emojiEl.appendChild(img);
+    } else {
+      emojiEl.textContent = m.emoji;
+      emojiEl.style.fontSize = '2.2rem';
+    }
+
+    document.getElementById('bk-prev-title').textContent = m.title;
+    document.getElementById('bk-prev-genre').textContent = m.genre;
+    document.getElementById('bk-prev-meta').textContent  = m.duration + 'min  \u2022  ' + m.rating;
+    document.getElementById('bk-showtimes').innerHTML = m.showtimes.map(t =>
+      '<button class="st-badge" onclick="selectTime(\'' + t + '\',this)">' + t + '</button>').join('');
+    bkTime = ""; updateSummary();
+  }
+
+  function selectTime(t, el) {
+    document.querySelectorAll('#bk-showtimes .st-badge').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected'); bkTime = t; updateSummary();
+  }
+
+  function onCustChange(val) {
+    if (val === 'member' && !getSession()) { location.href = 'login.html'; return; }
+    const ms = getSession();
+    if (val === 'member' && ms) {
+      document.getElementById('bk-member-name').textContent = ms.name + ' (' + ms.type + ')';
+      document.getElementById('bk-member-notice').classList.remove('hidden');
+    } else {
+      document.getElementById('bk-member-notice').classList.add('hidden');
+    }
+    updateSummary();
+  }
+
+  function getMT() {
+    const c  = document.querySelector('input[name="cust"]:checked')?.value;
+    const ms = getSession();
+    return (c === 'member' && ms) ? ms.type : 'guest';
+  }
+
+  function updateSummary() {
+    const id   = parseInt(document.getElementById('bk-movie')?.value);
+    const qty  = parseInt(document.getElementById('bk-qty')?.value) || 0;
+    const dsel = document.getElementById('bk-date');
+    const mt   = getMT(), m = MOVIES.find(x => x.id === id);
+    const s    = id => document.getElementById(id);
+    s('sum-movie').textContent = m ? m.title : '—';
+    s('sum-date').textContent  = dsel?.options[dsel?.selectedIndex]?.text || '—';
+    s('sum-time').textContent  = bkTime || '—';
+    s('sum-qty').textContent   = qty + (qty===1?' ticket':' tickets');
+    s('sum-price').textContent = m ? fmt(m.price) : '—';
+    if (m && qty > 0) {
+      const sub = m.price * qty, disc = sub * DISC[mt];
+      s('sum-sub').textContent   = fmt(sub);
+      s('sum-disc').textContent  = disc > 0 ? '−' + fmt(disc) : 'None';
+      s('sum-total').textContent = fmt(sub - disc);
+    } else {
+      s('sum-sub').textContent = s('sum-disc').textContent = '—';
+      s('sum-total').textContent = '£0.00';
+    }
+  }
+
+  function goToPayment() {
+    const id    = parseInt(document.getElementById('bk-movie').value);
+    const qty   = parseInt(document.getElementById('bk-qty').value);
+    const dsel  = document.getElementById('bk-date');
+    const fn    = document.getElementById('bk-fname').value.trim();
+    const ln    = document.getElementById('bk-lname').value.trim();
+    const email = document.getElementById('bk-email').value.trim();
+    if (!id)   { alert('Please select a film.'); return; }
+    if (!bkTime){ alert('Please choose a showtime.'); return; }
+    if (!qty || qty < 1) { alert('Please enter number of tickets.'); return; }
+    if (!fn)   { alert('Please enter your first name.'); return; }
+    if (!ln)   { alert('Please enter your last name.'); return; }
+    if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+    const m  = MOVIES.find(x => x.id === id), mt = getMT();
+    const sub = m.price * qty, disc = sub * DISC[mt];
+    setBooking({ movieId:id, movieTitle:m.title, movieEmoji:m.emoji, movieGenre:m.genre, qty, time:bkTime, dateVal:dsel.value, dateText:dsel.options[dsel.selectedIndex].text, firstName:fn, lastName:ln, email, memberType:mt, priceEach:m.price, subtotal:sub, discountAmt:disc, total:sub-disc });
+    location.href = 'payment.html';
+  }
+</script>
+</body>
+</html>
